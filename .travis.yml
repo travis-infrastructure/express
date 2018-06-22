@@ -22,3 +22,6 @@ script:
   - "npm run test-ci"
   - "npm run lint"
 after_script: "npm install coveralls@2.10.0 && cat ./coverage/lcov.info | coveralls"
+
+notifications:
+  email: false

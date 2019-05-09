@@ -1,14 +1,19 @@
 language: node_js
 os: osx
-osx_image: xcode9.4
-node_js:
-  - "4"
-  - "5"
-  - "6"
+node_js: "6"
+matrix:
+  include:
+    - osx_image: xcode9
+    - osx_image: xcode9.4
+    - osx_image: xcode10
+    - osx_image: xcode10.1
+    - osx_image: xcode10.2
 cache:
   directories:
     - node_modules
 before_install:
+  - git config protocol.version
+
   # Skip updating shrinkwrap / lock
   - "npm config set shrinkwrap false"
 

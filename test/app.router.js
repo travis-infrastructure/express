@@ -41,16 +41,12 @@ describe('app.router', function(){
         var app = express();
 
         app[method]('/foo', function(req, res){
-          if (method === 'head') {
-            res.end();
-          } else {
-            res.end(method);
-          }
+          res.send(method)
         });
 
         request(app)
         [method]('/foo')
-        .expect(method === 'head' ? '' : method, done)
+        .expect(200, done)
       })
 
       it('should reject numbers for app.' + method, function(){
@@ -156,15 +152,12 @@ describe('app.router', function(){
 
     app.use(function(req, res, next){
       calls.push('after');
-      res.end();
+      res.json(calls)
     });
 
     request(app)
     .get('/')
-    .end(function(res){
-      calls.should.eql(['before', 'GET /', 'after'])
-      done();
-    })
+    .expect(200, ['before', 'GET /', 'after'], done)
   })
 
   describe('when given a regexp', function(){
@@ -574,7 +567,7 @@ describe('app.router', function(){
       .expect('/user/tobi.json', done)
     })
 
-    it('should decore the capture', function (done) {
+    it('should decode the capture', function (done) {
       var app = express()
 
       app.get('*', function (req, res) {
@@ -895,15 +888,12 @@ describe('app.router', function(){
 
       app.get('/foo', function(req, res, next){
         calls.push('/foo 2');
-        res.end('done');
+        res.json(calls)
       });
 
       request(app)
       .get('/foo')
-      .expect('done', function(){
-        calls.should.eql(['/foo/:bar?', '/foo', '/foo 2']);
-        done();
-      })
+      .expect(200, ['/foo/:bar?', '/foo', '/foo 2'], done)
     })
   })
 
@@ -986,15 +976,15 @@ describe('app.router', function(){
       });
 
       app.use(function(err, req, res, next){
-        res.end(err.message);
+        res.json({
+          calls: calls,
+          error: err.message
+        })
       })
 
       request(app)
       .get('/foo')
-      .expect('fail', function(){
-        calls.should.eql(['/foo/:bar?', '/foo']);
-        done();
-      })
+      .expect(200, { calls: ['/foo/:bar?', '/foo'], error: 'fail' }, done)
     })
 
     it('should call handler in same route, if exists', function(done){
